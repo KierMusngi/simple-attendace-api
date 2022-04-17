@@ -7,8 +7,22 @@ const dailyTimeRecordsController = express.Router();
 // GET: http://localhost:3000/daily-time-records
 dailyTimeRecordsController.get('/', async (req, res) => {
     try {
-        const dtrs = await TimeLog.find();
-        res.status(200).send(dtrs);
+        const logs = await TimeLog.find();
+
+        const dailyTimeRecords = await Promise.all(logs.map(async (log) => {
+            const employee = await Employee.findById(log.employeeId);
+            const dtr = {
+                id: log._id,
+                employeeId: log.employeeId,
+                employeeName: employee.name,
+                employeePosition: employee.position,
+                timeIn: log.time,
+                timeOut: 'not yet available'
+            }
+            return dtr;
+        }));
+
+        res.status(200).send(dailyTimeRecords);
     } catch (err) {
         res.status(500).json({message: err.message});
     }
