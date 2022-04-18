@@ -36,7 +36,6 @@ usersController.post('/', async (req, res) => {
     const {
         userName,
         password,
-        email,
         name,
         role
     } = req.body;
@@ -44,7 +43,6 @@ usersController.post('/', async (req, res) => {
     const user = new User({
         userName,
         password,
-        email,
         name,
         role
     });
