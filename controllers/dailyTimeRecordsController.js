@@ -1,6 +1,7 @@
 import express from "express";
 import { Employee } from "../models/employee.js";
 import { TimeLog } from "../models/timeLog.js";
+import { getPairedLogs, groupByEmployeeId, groupByTimeLog, pairLogs } from "../utilities/dailyTimeRecordUtil.js";
 
 const dailyTimeRecordsController = express.Router();
 
@@ -8,21 +9,23 @@ const dailyTimeRecordsController = express.Router();
 dailyTimeRecordsController.get('/', async (req, res) => {
     try {
         const logs = await TimeLog.find();
+        const groupedByEmployeeId = groupByEmployeeId(logs);
 
-        const dailyTimeRecords = await Promise.all(logs.map(async (log) => {
-            const employee = await Employee.findById(log.employeeId);
-            const dtr = {
-                id: log._id,
-                employeeId: log.employeeId,
-                employeeName: employee.name,
-                employeePosition: employee.position,
-                timeIn: log.time,
-                timeOut: 'not yet available'
-            }
-            return dtr;
+        const dailyTimeRecords = [];
+        await Promise.all(groupedByEmployeeId.map(async (a) => {
+            const employee = await Employee.findById(a.employeeId);
+
+            const groupedByTimeLog = groupByTimeLog(a.timeLogs);
+            groupedByTimeLog.map(b => {
+                dailyTimeRecords.push(pairLogs(b.timeLogs, employee));
+            });
         }));
 
-        res.status(200).send(dailyTimeRecords);
+        const sortedDailyTimeRecords = dailyTimeRecords.sort((a, b) => {
+            return new Date(a.timeIn) - new Date(b.timeIn);
+        });
+
+        res.status(200).send(sortedDailyTimeRecords);
     } catch (err) {
         res.status(500).json({message: err.message});
     }
@@ -35,7 +38,8 @@ dailyTimeRecordsController.get('/:id', async (req, res) => {
 
     try {
         const dtrs = await TimeLog.find({ employeeId: `${req.params.id}`});
-        res.status(200).send(dtrs);
+        const pairedLogs = getPairedLogs(dtrs, employee);
+        res.status(200).send(pairedLogs);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
