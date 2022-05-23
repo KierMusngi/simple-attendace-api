@@ -15,6 +15,7 @@ db.once('open', () => console.log('Connected to database'));
 
 const app = express();
 app.use(express.json());
+app.use(express.static('public'));
 app.use(cors());
 
 // controllers
