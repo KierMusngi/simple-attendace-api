@@ -1,7 +1,5 @@
 import express from "express";
 import { User } from "../models/user.js";
-import fs from "fs";
-import multer from 'multer';
 
 const usersController = express.Router();
 
@@ -55,46 +53,6 @@ usersController.post('/', async (req, res) => {
     } catch (err) {
         res.status(400).json({message: err.message});
     }
-});
-
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, 'public/test')
-    },
-    filename: (req, file, cb) => {
-      cb(null, Date.now() + '-' + file.originalname)
-    }
-});
-  
-const upload = multer({ storage: storage }).single('file');
-
-// POST: http://localhost:3000/users/save
-// usersController.post('/save', async (req, res) => {
-//     const {
-//         images
-//     } = req.body;
-    
-//     try {
-//         for (let count = 0; count < images.length; count++) {
-//             console.log('image', images[count]);
-//             const base64Data = images[count].replace(/^data:image\/png;base64,/, '');
-
-//             fs.writeFile(`${count + 1}.png`, base64Data, 'base64', (err) => {
-//                 console.log(err);
-//             });
-//         }
-        
-//         res.status(201).json(newUser);
-//     } catch (err) {
-//         res.status(400).json({message: err.message});
-//     }
-// });
-
-usersController.post('/save', (req, res) => {
-    upload(req, res, (err) => {
-        if (err) res.status(500).json({message: err});
-        res.send(req.file);
-    });
 });
 
 // TODO: Implement once needed
