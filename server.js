@@ -25,4 +25,5 @@ app.use('/daily-time-records', dailyTimeRecordsController);
 app.use('/users', usersController);
 app.use('/login', authController);
 
-app.listen(8080, () => console.log('Server started'));
+const port = 8080;
+app.listen(port, () => console.log(`Server started http://localhost:${port}`));
