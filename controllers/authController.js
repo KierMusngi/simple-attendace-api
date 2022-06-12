@@ -21,9 +21,9 @@ authController.post('/', async (req, res) => {
             res.status(401).json({message: "Password did not match"});
         } else {
             const userId = user._id;
-            const token = jwt.sign({userId}, process.env.JWT_SECRET, {
-                expiresIn: 300
-            });
+            const name = user.name;
+            const role = user.role;
+            const token = jwt.sign({userId, name, role}, process.env.JWT_SECRET);
 
             res.status(200).json({ auth: true, token: token });
         }

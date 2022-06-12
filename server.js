@@ -7,6 +7,7 @@ import timeLogsController from './controllers/timeLogsController.js';
 import dailyTimeRecordsController from './controllers/dailyTimeRecordsController.js';
 import usersController from './controllers/usersController.js';
 import authController from './controllers/authController.js';
+import espController from './controllers/espController.js';
 
 mongoose.connect(process.env.CONNECTION_STRING);
 const db = mongoose.connection;
@@ -24,6 +25,7 @@ app.use('/time-logs', timeLogsController);
 app.use('/daily-time-records', dailyTimeRecordsController);
 app.use('/users', usersController);
 app.use('/login', authController);
+app.use('/esp', espController);
 
 const port = 8080;
 app.listen(port, () => console.log(`Server started http://localhost:${port}`));
