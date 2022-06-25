@@ -19,19 +19,19 @@ const registeredFacesSchema = new mongoose.Schema({
     },
     left: {
         type: String,
-        required: true
+        required: false
     },
     right: {
         type: String,
-        required: true
+        required: false
     },
     bottom: {
         type: String,
-        required: true
+        required: false
     },
     top: {
         type: String,
-        required: true
+        required: false
     },
     extra: {
         type: Object,

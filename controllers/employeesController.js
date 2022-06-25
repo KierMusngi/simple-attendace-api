@@ -26,6 +26,16 @@ employeesController.get('/', async (req, res) => {
     }
 });
 
+// GET: http://localhost:3000/employees/count
+employeesController.get('/count', async (req, res) => {
+    try {
+        const employeeCount = await Employee.count();
+        res.status(200).json({ count: employeeCount });
+    } catch (err) {
+        res.status(500).json({message: err.message});
+    }
+});
+
 // GET: http://localhost:3000/employees/:id
 employeesController.get('/:id', findEmployee, (req, res) => {
     res.status(200).json(res.employee);

@@ -9,6 +9,7 @@ import usersController from './controllers/usersController.js';
 import authController from './controllers/authController.js';
 import espController from './controllers/espController.js';
 import androidController from './controllers/androidController.js';
+import dashboardController from './controllers/dashboardController.js';
 
 mongoose.connect(process.env.CONNECTION_STRING);
 const db = mongoose.connection;
@@ -27,7 +28,8 @@ app.use('/daily-time-records', dailyTimeRecordsController);
 app.use('/users', usersController);
 app.use('/login', authController);
 app.use('/esp', espController);
-app.use('/android', androidController)
+app.use('/android', androidController);
+app.use('/dashboard', dashboardController);
 
 const port = 8080;
 app.listen(port, () => console.log(`Server started http://localhost:${port}`));

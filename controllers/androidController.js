@@ -47,6 +47,13 @@ androidController.post('/register', async (req, res) => {
         
         const employee = new Employee({ name, position });
 
+        const employeeExist = await Employee.findOne({name: name})
+
+        if (employeeExist) {
+            res.status(400).json("Employee already exists");
+            return;
+        }
+
         const newRegisteredFace = await registeredFace.save();
         const newEmployee = await employee.save();
 
