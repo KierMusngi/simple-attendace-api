@@ -1,5 +1,7 @@
 import express from "express";
 import { Employee } from '../models/employee.js';
+import { TimeLog } from "../models/timeLog.js";
+import { RegisteredFaces } from "../models/registeredFaces.js";
 
 const employeesController = express.Router();
 
@@ -74,7 +76,10 @@ employeesController.put('/:id', findEmployee, async (req, res) => {
 // DELETE: http://localhost:3000/employees/:id
 employeesController.delete('/:id', findEmployee, async (req, res) => {
     try {
+        await TimeLog.find({ employeeId: res.employee._id}).deleteMany();
+        await RegisteredFaces.find({name: res.employee.name}).deleteMany();
         await res.employee.remove();
+
         res.status(200).json({ message: 'Deleted employee'});
     } catch (err) {
         res.status(500).json({ message: err.message });

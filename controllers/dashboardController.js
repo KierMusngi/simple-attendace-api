@@ -25,17 +25,35 @@ const getRecentAttendees = async () => {
     return topAttendees;
 }
 
+const getEmployeeCount = async () => {
+    return await Employee.count();
+}
+
+const getOnTimeCount = () => {
+    return 50;
+}
+
+const getLateCount = () => {
+    return 25;
+}
+
+const getAbsentCount = () => {
+    return 10;
+}
 // GET: http://localhost:3000/dashboard/counts
 dashboardController.get('/counts', async (req, res) => {
     try {
-        const employeeCount = await Employee.count();
+        const employeeCount = await getEmployeeCount();
         const topAttendees = await getRecentAttendees();
+        const onTimeCount = getOnTimeCount();
+        const lateCount = getLateCount();
+        const absentCount = getAbsentCount();
 
         res.status(200).json({
             employeeCount: employeeCount,
-            onTimeCount: 5,
-            lateCount: 30,
-            absentCount: 50,
+            onTimeCount: onTimeCount,
+            lateCount: lateCount,
+            absentCount: absentCount,
             topAttendees
         });
     } catch (err) {
