@@ -7,6 +7,16 @@ import axios from "axios";
 
 const androidController = express.Router();
 
+const openGate = async () => {
+    await axios.get('http://192.168.1.100/open-gate')
+        .then(res => {
+            console.log(res);
+        })
+        .catch(e => {
+            console.log(e);
+        });
+}
+
 androidController.get('/', async (req, res) => {
     try {
         const registeredFaces = await RegisteredFaces.find();
@@ -36,8 +46,8 @@ androidController.post('/punch', async (req, res) => {
         });
 
         await dtr.save();
-        console.log("Open door");
-        // axios.get('http://192.168.1.100/open-gate');
+        await openGate();
+        console.log("Open gate");
         res.status(201).json({message: "Door opened"});
     } catch (err) {
         res.status(500).json({message: err.message});

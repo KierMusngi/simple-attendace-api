@@ -14,7 +14,8 @@ export const pairLogs = (timeLogs, employee) => {
         employeeName: employee.name,
         employeePosition: employee.position,
         timeIn: timeIn.time,
-        timeOut: timeOut.time
+        timeOut: timeOut.time, 
+        totalHours: new Date(timeOut.time).getHours() - new Date(timeIn.time).getHours()
     };
 };
 
