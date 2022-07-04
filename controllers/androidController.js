@@ -7,6 +7,9 @@ import axios from "axios";
 
 const androidController = express.Router();
 
+var maxIntruderTrial = 3;
+var intruderTrialCount = 0;
+
 const openGate = async () => {
     await axios.get('http://192.168.1.100/open-gate')
         .then(res => {
@@ -15,7 +18,17 @@ const openGate = async () => {
         .catch(e => {
             console.log(e);
         });
-}
+};
+
+const triggerAlarm = async () => {
+    await axios.get('http://192.168.1.100/alarm')
+        .then(res => {
+            console.log(res);
+        })
+        .catch(e => {
+            console.log(e);
+        });
+};
 
 androidController.get('/', async (req, res) => {
     try {
@@ -32,7 +45,13 @@ androidController.post('/punch', async (req, res) => {
 
     const employee = await Employee.findOne({ name: name });
     if (!employee) {
-        console.log("Intruder!")
+        console.log("Intruder Alert!");
+        intruderTrialCount++;
+        if (intruderTrialCount >= maxIntruderTrial){
+            console.log("Alarm System!");
+            // await triggerAlarm();
+            intruderTrialCount = 0;
+        }
         return res.status(400).json({ message: 'Cannot find employee' })
     };
 
@@ -46,8 +65,9 @@ androidController.post('/punch', async (req, res) => {
         });
 
         await dtr.save();
-        await openGate();
+        // await openGate();
         console.log("Open gate");
+        intruderTrialCount = 0;
         res.status(201).json({message: "Door opened"});
     } catch (err) {
         res.status(500).json({message: err.message});
