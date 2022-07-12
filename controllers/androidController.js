@@ -7,23 +7,23 @@ import axios from "axios";
 
 const androidController = express.Router();
 
-var maxIntruderTrial = 3;
+var maxIntruderTrial = 5;
 var intruderTrialCount = 0;
 
 const openGate = async () => {
     await axios.get('http://192.168.1.100/open-gate')
         .then(res => {
-            console.log(res);
+            console.log(res.data);
         })
         .catch(e => {
             console.log(e);
         });
 };
 
-const triggerAlarm = async () => {
+const activateAlarm = async () => {
     await axios.get('http://192.168.1.100/alarm')
         .then(res => {
-            console.log(res);
+            console.log(res.data);
         })
         .catch(e => {
             console.log(e);
@@ -49,8 +49,8 @@ androidController.post('/punch', async (req, res) => {
         intruderTrialCount++;
         if (intruderTrialCount >= maxIntruderTrial){
             console.log("Alarm System!");
-            // await triggerAlarm();
             intruderTrialCount = 0;
+            await activateAlarm();
         }
         return res.status(400).json({ message: 'Cannot find employee' })
     };
@@ -65,7 +65,7 @@ androidController.post('/punch', async (req, res) => {
         });
 
         await dtr.save();
-        // await openGate();
+        await openGate();
         console.log("Open gate");
         intruderTrialCount = 0;
         res.status(201).json({message: "Door opened"});
