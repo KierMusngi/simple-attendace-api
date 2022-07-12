@@ -2,6 +2,7 @@ import express from "express";
 import { RegisteredFaces } from "../models/registeredFaces.js";
 import { TimeLog } from '../models/timeLog.js';
 import { Employee } from '../models/employee.js';
+import { Notification } from "../models/notification.js";
 import { getDateTimeNow } from '../utilities/dateTimeUtil.js';
 import axios from "axios";
 
@@ -51,6 +52,17 @@ androidController.post('/punch', async (req, res) => {
             console.log("Alarm System!");
             intruderTrialCount = 0;
             await activateAlarm();
+
+            const notification = new Notification({
+                message: "Intruder Detected",
+                time: getDateTimeNow()
+            });
+            
+            try {
+                await notification.save();
+            } catch (err) {
+                console.log(err.message);
+            }
         }
         return res.status(400).json({ message: 'Cannot find employee' })
     };
