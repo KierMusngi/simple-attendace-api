@@ -16,6 +16,7 @@ var intruderTrialCount = 0;
 const getRecentTimein = async (employee) => {
     const dtrs = await TimeLog.find({ employeeId: `${employee._id}`});
     const pairedLogs = getPairedLogs(dtrs, employee);
+    if (pairedLogs.length === 0) return null;
     const recentTimein = new Date(pairedLogs[pairedLogs.length-1].timeIn);
     const minsToAdd = 30;
     const futureDate = new Date(recentTimein.getTime() + minsToAdd*60000);
@@ -86,7 +87,7 @@ androidController.post('/punch', async (req, res) => {
         console.log(recent);
         const dateNow = getDateTimeNow();
 
-        if (new Date(dateNow) > new Date(recent)){
+        if ((recent === null) || (new Date(dateNow) > new Date(recent))) {
             const dtr = new TimeLog({
                 employeeId: employee._id,
                 time: dateNow
