@@ -4,12 +4,23 @@ import { TimeLog } from '../models/timeLog.js';
 import { Employee } from '../models/employee.js';
 import { Notification } from "../models/notification.js";
 import { getDateTimeNow } from '../utilities/dateTimeUtil.js';
+import { getPairedLogs } from "../utilities/dailyTimeRecordUtil.js";
+
 import axios from "axios";
 
 const androidController = express.Router();
 
 var maxIntruderTrial = 5;
 var intruderTrialCount = 0;
+
+const getRecentTimein = async (employee) => {
+    const dtrs = await TimeLog.find({ employeeId: `${employee._id}`});
+    const pairedLogs = getPairedLogs(dtrs, employee);
+    const recentTimein = new Date(pairedLogs[pairedLogs.length-1].timeIn);
+    const minsToAdd = 30;
+    const futureDate = new Date(recentTimein.getTime() + minsToAdd*60000);
+    return futureDate;
+};
 
 const openGate = async () => {
     await axios.get('http://192.168.1.100/open-gate')
@@ -71,16 +82,26 @@ androidController.post('/punch', async (req, res) => {
     if (!registeredFace) return res.status(400).json({ message: 'Face is not registered' });
 
     try {
-        const dtr = new TimeLog({
-            employeeId: employee._id,
-            time: getDateTimeNow()
-        });
+        const recent = await getRecentTimein(employee);
+        console.log(recent);
+        const dateNow = getDateTimeNow();
 
-        await dtr.save();
-        await openGate();
-        console.log("Open gate");
-        intruderTrialCount = 0;
-        res.status(201).json({message: "Door opened"});
+        if (new Date(dateNow) > new Date(recent)){
+            const dtr = new TimeLog({
+                employeeId: employee._id,
+                time: dateNow
+            });
+
+            await dtr.save();
+            await openGate();
+            console.log("Open gate");
+            intruderTrialCount = 0;
+            res.status(201).json({message: "Door opened"});
+        }
+        else {
+            res.status(200).json({message: 'Next time in should be in 30 minutes'});
+        }
+
     } catch (err) {
         res.status(500).json({message: err.message});
     }
